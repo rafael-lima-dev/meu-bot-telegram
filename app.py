@@ -1,7 +1,6 @@
-import os
-import threading
+import asyncio
 from flask import Flask
-from bot import main as start_bot  # importa sua função main()
+from bot import main as start_bot
 
 app = Flask(__name__)
 
@@ -9,5 +8,9 @@ app = Flask(__name__)
 def home():
     return "Bot rodando no Render!"
 
-# Iniciar o bot em uma thread separada
-threading.Thread(target=start_bot).start()
+# Inicializa o bot de forma assíncrona
+async def run_bot():
+    await asyncio.to_thread(start_bot)
+
+loop = asyncio.get_event_loop()
+loop.create_task(run_bot())

@@ -233,13 +233,13 @@ def main():
     print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
     app = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
 
-    
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto))
-    
+
     print("Aguardando clientes...")
     app.run_polling()
+
 
 if __name__ == "__main__":
     main()
