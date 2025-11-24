@@ -1,6 +1,7 @@
 import threading
+import asyncio
 from flask import Flask
-from bot import main as start_bot
+from bot import main_async
 
 app = Flask(__name__)
 
@@ -9,7 +10,6 @@ def home():
     return "Bot rodando no Render!"
 
 def run_bot_thread():
-    start_bot()
+    asyncio.run(main_async())
 
-# iniciar bot em thread separada (ESSENCIAL NO RENDER)
 threading.Thread(target=run_bot_thread, daemon=True).start()

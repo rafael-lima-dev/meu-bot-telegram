@@ -221,7 +221,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # ---------------------------------------------------------------------------
 # 6. MAIN — (CORRETO PARA RENDER + PTB 21 + FLASK)
 # ---------------------------------------------------------------------------
-def main():
+async def main_async():
     print("🚀 BOT DE VENDAS INICIADO!")
 
     application = Application.builder().token(TOKEN).build()
@@ -232,7 +232,9 @@ def main():
         MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto)
     )
 
-    application.run_polling()  # NÃO usar async
-
-if __name__ == "__main__":
-    main()
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
+    
+    # mantém o bot rodando
+    await application.wait_closed()
