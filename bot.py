@@ -232,7 +232,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 
-async def main():
+def main():
     print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
 
     application = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
@@ -243,12 +243,9 @@ async def main():
 
     print("Aguardando clientes...")
 
-    # Inicializa o bot manualmente (sem bloquear)
-    await application.initialize()
-    await application.start()
-    await application.updater.start_polling()
+    application.run_polling()
 
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
