@@ -11,14 +11,8 @@ from telegram.ext import (
     filters
 )
 
-# ---------------------------------------------------------------------------
-# CONFIGURAÇÕES GERAIS
-# ---------------------------------------------------------------------------
 TOKEN = os.getenv("TOKEN")
 
-# ---------------------------------------------------------------------------
-# BANCO DE DADOS DOS CURSOS
-# ---------------------------------------------------------------------------
 CATALOGO = {
     "portugues": {  
         "titulo": "📚 Português para Concursos",
@@ -49,7 +43,7 @@ logging.basicConfig(
 )
 
 # ---------------------------------------------------------------------------
-# 1. MENU E BOAS VINDAS
+# 1. MENU E BOAS-VINDAS
 # ---------------------------------------------------------------------------
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
@@ -88,14 +82,14 @@ async def mostrar_vitrine(update: Update, context: ContextTypes.DEFAULT_TYPE, te
         )
 
 # ---------------------------------------------------------------------------
-# 2. FILTRO DE TEXTO
+# 2. FILTRO TEXTO
 # ---------------------------------------------------------------------------
 async def filtrar_texto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     await mostrar_vitrine(update, context, f"Olá, {user.first_name}! Use os botões abaixo para navegar:")
 
 # ---------------------------------------------------------------------------
-# 3. DETALHES E COMPRA
+# 3. DETALHES DO CURSO
 # ---------------------------------------------------------------------------
 async def mostrar_detalhes(update: Update, context: ContextTypes.DEFAULT_TYPE, produto_key):
     query = update.callback_query
@@ -152,7 +146,7 @@ async def tela_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE, pro
     )
 
 # ---------------------------------------------------------------------------
-# 4. ENTREGA DOS LINKS
+# 4. ENTREGA DO ACESSO
 # ---------------------------------------------------------------------------
 async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, produto_key):
     query = update.callback_query
@@ -199,7 +193,7 @@ async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, pr
         )
 
 # ---------------------------------------------------------------------------
-# 5. ROTEADOR DE BOTÕES
+# 5. CALLBACK DOS BOTÕES
 # ---------------------------------------------------------------------------
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -225,7 +219,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 # ---------------------------------------------------------------------------
-# 6. MAIN (PTB 21+)
+# 6. MAIN — (CORRETO PARA RENDER + PTB 21 + FLASK)
 # ---------------------------------------------------------------------------
 def main():
     print("🚀 BOT DE VENDAS INICIADO!")
@@ -238,7 +232,7 @@ def main():
         MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto)
     )
 
-    application.run_polling()
+    application.run_polling()  # NÃO usar async
 
 if __name__ == "__main__":
     main()
