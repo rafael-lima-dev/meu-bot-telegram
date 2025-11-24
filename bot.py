@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     ApplicationBuilder, 
@@ -229,17 +230,25 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         kb = [[InlineKeyboardButton("🔙 Voltar", callback_data='menu_principal')]]
         await query.edit_message_text(msg, reply_markup=InlineKeyboardMarkup(kb), parse_mode='Markdown')
 
-def main():
-    print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
-    app = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
 
-    app.add_handler(CommandHandler("start", start))
-    app.add_handler(CallbackQueryHandler(button_callback))
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto))
+
+async def main():
+    print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
+
+    application = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
+
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CallbackQueryHandler(button_callback))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto))
 
     print("Aguardando clientes...")
-    app.run_polling()
+
+    # Inicializa o bot manualmente (sem bloquear)
+    await application.initialize()
+    await application.start()
+    await application.updater.start_polling()
+
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())
