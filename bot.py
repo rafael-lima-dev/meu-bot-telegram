@@ -235,7 +235,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def main():
     print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
 
-    application = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
+    application = ApplicationBuilder().token(TOKEN).build()
+
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_callback))
