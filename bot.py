@@ -1,4 +1,5 @@
 import logging
+import os
 import random
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
@@ -13,7 +14,7 @@ from telegram.ext import (
 # ---------------------------------------------------------------------------
 # CONFIGURAÇÕES GERAIS
 # ---------------------------------------------------------------------------
-TOKEN = "7949047232:AAF8RX2oS7cBmW9azTwlA5W3OCkFEsoLVsM"
+TOKEN = os.getenv("TOKEN")
 
 # ---------------------------------------------------------------------------
 # BANCO DE DADOS DOS CURSOS
@@ -230,7 +231,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     print("🚀 BOT DE VENDAS MULTI-CANAIS INICIADO!")
-    app = ApplicationBuilder().token(TOKEN).build()
+    app = ApplicationBuilder().concurrent_updates(True).token(TOKEN).build()
+
     
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CallbackQueryHandler(button_callback))
