@@ -1,6 +1,7 @@
 import logging
 import os
 import random
+import asyncio
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -42,9 +43,9 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# ---------------------------------------------------------------------------
-# 1. MENU E BOAS-VINDAS
-# ---------------------------------------------------------------------------
+# ============================================================
+# 1. START
+# ============================================================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     inscritos = random.randint(4850, 4990)
@@ -58,6 +59,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await mostrar_vitrine(update, context, texto)
 
+
 async def mostrar_vitrine(update: Update, context: ContextTypes.DEFAULT_TYPE, texto_msg=None):
     keyboard = [
         [InlineKeyboardButton("📚 Curso de Português", callback_data='info_portugues')],
@@ -70,27 +72,27 @@ async def mostrar_vitrine(update: Update, context: ContextTypes.DEFAULT_TYPE, te
     
     if update.callback_query:
         await update.callback_query.message.edit_text(
-            msg, 
+            msg,
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode='Markdown'
         )
     else:
         await update.message.reply_text(
-            msg, 
+            msg,
             reply_markup=InlineKeyboardMarkup(keyboard),
             parse_mode='Markdown'
         )
 
-# ---------------------------------------------------------------------------
-# 2. FILTRO TEXTO
-# ---------------------------------------------------------------------------
+# ============================================================
+# 2. FILTRO DE TEXTO
+# ============================================================
 async def filtrar_texto(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     await mostrar_vitrine(update, context, f"Olá, {user.first_name}! Use os botões abaixo para navegar:")
 
-# ---------------------------------------------------------------------------
-# 3. DETALHES DO CURSO
-# ---------------------------------------------------------------------------
+# ============================================================
+# 3. DETALHES / PAGAMENTO / ENTREGA
+# ============================================================
 async def mostrar_detalhes(update: Update, context: ContextTypes.DEFAULT_TYPE, produto_key):
     query = update.callback_query
 
@@ -102,10 +104,10 @@ async def mostrar_detalhes(update: Update, context: ContextTypes.DEFAULT_TYPE, p
     
     texto = (
         f"📦 **{item['titulo']}**\n"
-        "➖➖➖➖➖➖➖➖➖➖\n"
+        "➖➖➖\n"
         f"{item['desc']}\n\n"
         f"💰 **Investimento:** {item['preco']}\n"
-        "➖➖➖➖➖➖➖➖➖➖\n"
+        "➖➖➖\n"
         "Deseja garantir sua vaga?"
     )
     
@@ -119,6 +121,7 @@ async def mostrar_detalhes(update: Update, context: ContextTypes.DEFAULT_TYPE, p
         reply_markup=InlineKeyboardMarkup(keyboard),
         parse_mode="Markdown"
     )
+
 
 async def tela_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE, produto_key):
     query = update.callback_query
@@ -145,9 +148,7 @@ async def tela_pagamento(update: Update, context: ContextTypes.DEFAULT_TYPE, pro
         parse_mode="Markdown"
     )
 
-# ---------------------------------------------------------------------------
-# 4. ENTREGA DO ACESSO
-# ---------------------------------------------------------------------------
+
 async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, produto_key):
     query = update.callback_query
     await query.answer("Validando pagamento...")
@@ -167,10 +168,9 @@ async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, pr
             )
 
             texto = (
-                "🎉 <b>PARABÉNS! VOCÊ VIROU VIP!</b> 💎\n\n"
-                f"1️⃣ <a href='{link_port.invite_link}'>Entrar no canal de Português</a>\n"
-                f"2️⃣ <a href='{link_info.invite_link}'>Entrar no canal de Informática</a>\n\n"
-                "<i>Bons estudos!</i>"
+                "🎉 <b>PARABÉNS! VIP liberado!</b>\n\n"
+                f"1️⃣ <a href='{link_port.invite_link}'>Português</a>\n"
+                f"2️⃣ <a href='{link_info.invite_link}'>Informática</a>\n"
             )
         else:
             convite = await bot.create_chat_invite_link(
@@ -180,7 +180,7 @@ async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, pr
 
             texto = (
                 "🎉 <b>PAGAMENTO CONFIRMADO!</b>\n\n"
-                f"Aqui está seu acesso ao curso:\n"
+                f"Aqui está seu acesso:\n"
                 f"{convite.invite_link}"
             )
 
@@ -188,13 +188,13 @@ async def entregar_acesso(update: Update, context: ContextTypes.DEFAULT_TYPE, pr
 
     except Exception as e:
         await query.edit_message_text(
-            f"❌ <b>Erro ao gerar link:</b>\n{e}",
+            f"❌ Erro ao gerar link:\n{e}",
             parse_mode="HTML"
         )
 
-# ---------------------------------------------------------------------------
-# 5. CALLBACK DOS BOTÕES
-# ---------------------------------------------------------------------------
+# ============================================================
+# 4. CALLBACK
+# ============================================================
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -214,27 +214,28 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     elif data == "suporte":
         await query.edit_message_text(
-            "👨‍💻 **Suporte Técnico**\nFale com @Murilo",
+            "👨‍💻 Suporte: @Murilo",
             parse_mode="Markdown"
         )
 
-# ---------------------------------------------------------------------------
-# 6. MAIN — (CORRETO PARA RENDER + PTB 21 + FLASK)
-# ---------------------------------------------------------------------------
+# ============================================================
+# 5. **MAIN FINAL (100% CORRETO PARA RENDER FREE)**
+# ============================================================
 async def main_async():
-    print("🚀 BOT DE VENDAS INICIADO!")
+    print("🚀 BOT INICIADO!")
 
     application = Application.builder().token(TOKEN).build()
 
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_callback))
-    application.add_handler(
-        MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto)
-    )
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, filtrar_texto))
 
     await application.initialize()
     await application.start()
     await application.updater.start_polling()
-    
-    # mantém o bot rodando
-    await application.wait_closed()
+
+    # ESSA LINHA SAIU DO PTB21 → NÃO USE
+    # await application.wait_closed()
+
+    # esta linha mantém o bot vivo
+    await asyncio.Event().wait()
